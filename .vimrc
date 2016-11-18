@@ -38,6 +38,13 @@ Plugin 'beyondwords/vim-twig'
 " golang
 Plugin 'fatih/vim-go'
 
+" Javascript 
+Plugin 'elzr/vim-json'
+Plugin 'groenewege/vim-less'
+Plugin 'pangloss/vim-javascript'
+Plugin 'briancollins/vim-jst'
+Plugin 'kchmck/vim-coffee-script'
+
 call vundle#end()            " required
 filetype plugin indent on    " required
 
