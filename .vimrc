@@ -198,7 +198,10 @@ vnoremap > >gv
 " Allow using the repeat operator with a visual selection (!)
 vnoremap . :normal .<CR>
 
-
+" Change CursorShape when Iterm2&&OSX
+let &t_SI = "\<Esc>]50;CursorShape=1\x7"
+let &t_SR = "\<Esc>]50;CursorShape=2\x7"
+let &t_EI = "\<Esc>]50;CursorShape=0\x7"
 
 let g:vimshell_editor_command='/usr/local/bin/mvim'
 
