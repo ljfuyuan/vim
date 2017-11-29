@@ -30,6 +30,11 @@ Plugin 'Shougo/neosnippet'
 Plugin 'Shougo/neosnippet-snippets'
 Plugin 'honza/vim-snippets'
 
+" vim delve
+Plugin 'Shougo/vimshell.vim'
+Plugin 'Shougo/vimproc.vim'
+Plugin 'sebdah/vim-delve'
+
 " php
 Plugin 'spf13/PIV'
 Plugin 'arnaud-lb/vim-php-namespace'
@@ -56,7 +61,7 @@ let mapleader = ','
 if has('gui_running')
     set background=dark
 else
-    set background=light
+    set background=dark
 endif
 set mouse=a                 " Automatically enable mouse usage
 set mousehide               " Hide the mouse cursor while typing
@@ -107,9 +112,10 @@ set nojoinspaces                " Prevents inserting two spaces after punctuatio
 set splitright                  " Puts new vsplit windows to the right of the current
 set splitbelow                  " Puts new split windows to the bottom of the current
 set pastetoggle=<F12>           " pastetoggle (sane indentation on pastes)
+set autoread
 
 if has("gui_macvim")
-        set transparency=5 " Make the window slightly transparent
+            set transparency=5 " Make the window slightly transparent
 endif
 
 if has('cmdline_info')
@@ -161,7 +167,7 @@ nnoremap <silent> <leader>gc :Gcommit<CR>
 nnoremap <silent> <leader>gb :Gblame<CR>
 nnoremap <silent> <leader>gl :Glog<CR>
 nnoremap <silent> <leader>gp :Git push<CR>
-nnoremap <silent> <leader>gr :Gread<CR>
+"nnoremap <silent> <leader>gr :Gread<CR>
 nnoremap <silent> <leader>gw :Gwrite<CR>
 nnoremap <silent> <leader>ge :Gedit<CR>
 nnoremap <silent> <leader>ga :Git add -p %<CR>
@@ -194,6 +200,8 @@ vnoremap . :normal .<CR>
 
 
 
+let g:vimshell_editor_command='/usr/local/bin/mvim'
+
 highlight SyntasticErrorSign guifg=red
 
 let g:tagbar_ctags_bin='/usr/local/bin/ctags'
@@ -223,7 +231,7 @@ let g:tagbar_type_go = {
         \ 'ctype' : 't',
         \ 'ntype' : 'n'
     \ },
-    \ 'ctagsbin'  : 'gotags',
+    \ 'ctagsbin'  : expand("~/.gotools/gotags"),
     \ 'ctagsargs' : '-sort -silent'
 \ }
 
@@ -233,6 +241,9 @@ let g:solarized_contrast="normal"
 let g:solarized_visibility="normal"
 colorscheme solarized
 hi Cursor guibg=#FF0000
+hi CursorLine ctermbg=0 ctermfg=white
+hi LineNr ctermbg=0
+hi SignColumn ctermbg=0
 
 " NerdTree {
 let g:NERDShutUp=1
@@ -247,7 +258,7 @@ let NERDTreeKeepTreeInNewTab=1
 
 " php
 let g:syntastic_php_checkers = ['php', 'phpcs', 'phpmd']
-let g:DisableAutoPHPFolding = 0
+let g:DisableAutoPHPFolding = 1
 let g:PIVAutoClose = 0
 
 " golang
@@ -285,11 +296,15 @@ au FileType go nmap <leader>t <Plug>(go-test)
 au FileType go nmap <Leader>gv <Plug>(go-doc-vertical)
 au FileType go nmap <leader>co <Plug>(go-coverage)
 au FileType go nmap <Leader>gi <Plug>(go-install)
+au FileType go nmap <Leader>gr <Plug>(go-referrers)
             
 " Instead of reverting the cursor to the last position in the buffer, we
 " set it to the first line when editing a git commit message
 au FileType gitcommit au! BufEnter COMMIT_EDITMSG call setpos('.', [0, 1, 1, 0])
 autocmd BufEnter * if bufname("") !~ "^\[A-Za-z0-9\]*://" | lcd %:p:h | endif
+autocmd FocusGained,BufEnter,CursorHold,CursorHoldI * if mode() != 'c' | checktime | endif
+autocmd FileChangedShellPost *
+  \ echohl WarningMsg | echo "File changed on disk. Buffer reloaded." | echohl None
 
 command! -bang -nargs=* -complete=file E e<bang> <args>
 command! -bang -nargs=* -complete=file W w<bang> <args>
