@@ -63,6 +63,7 @@ if has('gui_running')
 else
     set background=dark
 endif
+set timeoutlen=1000 ttimeoutlen=0
 set mouse=a                 " Automatically enable mouse usage
 set mousehide               " Hide the mouse cursor while typing
 set clipboard=unnamed    " On mac and Windows, use * register for copy-paste
