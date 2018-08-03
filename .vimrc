@@ -389,5 +389,5 @@ function! Ulti_ExpandOrEnter()
         return "\<return>"
 endfunction
 
-" Set <space> as primary trigger
 inoremap <return> <C-R>=Ulti_ExpandOrEnter()<CR>
+inoremap <C-k> <C-R>=UltiSnips#ExpandSnippet()<CR>
