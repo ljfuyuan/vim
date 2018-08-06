@@ -1,7 +1,7 @@
 set nocompatible              " be iMproved, required
 filetype off                  " required
 
-" set the runtime path to include Vundle and initialize
+" set the runtime path to include Vunle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 " alternatively, pass a path where Vundle should install plugins
@@ -10,8 +10,8 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'scrooloose/nerdtree'
-Plugin 'altercation/vim-colors-solarized'
-Plugin 'itchyny/lightline.vim'
+Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
 Plugin 'jiangmiao/auto-pairs'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'bling/vim-bufferline'
@@ -48,6 +48,9 @@ Plugin 'pangloss/vim-javascript'
 Plugin 'briancollins/vim-jst'
 Plugin 'kchmck/vim-coffee-script'
 
+" Color theme
+Plugin 'NLKNguyen/papercolor-theme'
+
 call vundle#end()            " required
 filetype plugin indent on    " required
 
@@ -56,12 +59,9 @@ syntax on                   " Syntax highlighting
 scriptencoding utf-8
 let mapleader = ','
 
-if has('gui_running')
-    set background=dark
-else
-    set background=dark
-endif
 set timeoutlen=1000 ttimeoutlen=0
+set autoindent                    " take indent for new line from previous line
+set smartindent                   " enable smart indentation
 set mouse=a                 " Automatically enable mouse usage
 set mousehide               " Hide the mouse cursor while typing
 set clipboard=unnamed    " On mac and Windows, use * register for copy-paste
@@ -82,7 +82,6 @@ set guioptions-=r
 set guioptions-=L
 set relativenumber
 set nofoldenable
-set nolist
 set noai
 set cmdheight=8
 set nobackup
@@ -102,7 +101,6 @@ set whichwrap=b,s,h,l,<,>,[,]   " Backspace and cursor keys wrap too
 set scrolljump=5                " Lines to scroll when cursor leaves screen
 set scrolloff=3                 " Minimum lines to keep above and below cursor
 set nowrap                      " Do not wrap long lines
-set autoindent                  " Indent at the same level of the previous line
 set shiftwidth=4                " Use indents of 4 spaces
 set expandtab                   " Tabs are spaces, not tabs
 set tabstop=4                   " An indentation every four columns
@@ -112,9 +110,10 @@ set splitright                  " Puts new vsplit windows to the right of the cu
 set splitbelow                  " Puts new split windows to the bottom of the current
 set pastetoggle=<F12>           " pastetoggle (sane indentation on pastes)
 set autoread
-
+set list                          " show trailing whitespace
+set listchars=tab:\|\ 
 if has("gui_macvim")
-            set transparency=5 " Make the window slightly transparent
+    set transparency=5 " Make the window slightly transparent
 endif
 
 if has('cmdline_info')
@@ -150,13 +149,14 @@ map zl zL
 map zh zH
 map <S-H> gT
 map <S-L> gt
+map <S-B> :bn<CR>
 map <C-e> <plug>NERDTreeTabsToggle<CR>
 map <leader>e :NERDTreeFind<CR>
 
 noremap j gj
 noremap k gk
-noremap <leader>sv :source ~/.vimrc<CR>
 nnoremap Y y$
+noremap <leader>sv :source ~/.vimrc<CR>
 nnoremap <silent> <leader>tt :TagbarToggle<CR>
 
 " Fugitive {
@@ -206,7 +206,11 @@ let g:vimshell_editor_command='/usr/local/bin/vim'
 
 highlight SyntasticErrorSign guifg=red
 
+let g:delve_breakpoint_sign = "⇒"
+let g:delve_tracepoint_sign = "➝"
+
 let g:tagbar_ctags_bin='/usr/local/bin/ctags'
+let g:tagbar_iconchars = ['▸', '▾']
 let g:tagbar_autofocus=1
 let g:tagbar_sort=0
 let g:tagbar_type_go = {
@@ -237,15 +241,15 @@ let g:tagbar_type_go = {
     \ 'ctagsargs' : '-sort -silent'
 \ }
 
-let g:solarized_termcolors=256
-let g:solarized_termtrans=1
-let g:solarized_contrast="normal"
-let g:solarized_visibility="normal"
-colorscheme solarized
+"colorscheme 
+set background=dark
+colorscheme PaperColor
+
 hi Cursor guibg=#FF0000
-hi CursorLine ctermbg=0 ctermfg=white
-hi LineNr ctermbg=0
-hi SignColumn ctermbg=0
+highlight Search guibg=DeepPink4 guifg=White ctermfg=White
+"hi CursorLine ctermbg=0 ctermfg=white
+"hi LineNr ctermbg=0
+"hi SignColumn ctermbg=0
 
 " NerdTree {
 let g:NERDShutUp=1
@@ -265,13 +269,19 @@ let g:PIVAutoClose = 0
 
 " golang
 let g:go_bin_path = expand("~/.gotools")
+let g:go_highlight_types = 1
+let g:go_highlight_fields = 0
 let g:go_highlight_functions = 1
 let g:go_highlight_methods = 1
 let g:go_highlight_structs = 1
 let g:go_highlight_operators = 1
 let g:go_highlight_build_constraints = 1
+let g:go_highlight_extra_types = 1
+let g:go_highlight_function_calls = 1
 let g:go_fmt_command = "goimports"
 let g:go_list_type = "quickfix"
+let g:go_echo_command_info = 1
+let g:go_auto_type_info = 1
 
 let g:syntastic_auto_jump=1
 let g:syntastic_auto_loc_list=1
@@ -285,6 +295,15 @@ let g:syntastic_check_on_open = 0
 let g:syntastic_check_on_wq = 0
 map <leader>sc :SyntasticCheck<CR>
 
+" airline
+" Enable top tabline.
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#formatter = 'unique_tail'
+let g:airline_theme='powerlineish'
+" Explicitly define some symbols that did not work well for me in Linux.
+if !exists('g:airline_symbols')
+    let g:airline_symbols = {}
+endif
 " Rainbow {
 let g:rainbow_active = 1 "0 if you want to enable it later via :RainbowToggle
 "}
@@ -389,5 +408,6 @@ function! Ulti_ExpandOrEnter()
         return "\<return>"
 endfunction
 
+" Set <space> as primary trigger
 inoremap <return> <C-R>=Ulti_ExpandOrEnter()<CR>
 inoremap <C-k> <C-R>=UltiSnips#ExpandSnippet()<CR>
