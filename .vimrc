@@ -51,6 +51,9 @@ Plugin 'kchmck/vim-coffee-script'
 " Color theme
 Plugin 'NLKNguyen/papercolor-theme'
 
+" Translate
+Plugin 'VincentCordobes/vim-translate'
+
 call vundle#end()            " required
 filetype plugin indent on    " required
 
@@ -411,3 +414,8 @@ endfunction
 " Set <space> as primary trigger
 inoremap <return> <C-R>=Ulti_ExpandOrEnter()<CR>
 inoremap <C-k> <C-R>=UltiSnips#ExpandSnippet()<CR>
+
+" Set translate hotkey
+vnoremap <silent> <leader>t :TranslateVisual en:zh-CN<CR>
+nnoremap <silent> <leader>tc :TranslateClear<CR>
+vnoremap <silent> <leader>tb :TranslateVisual -e bing en:zh-CN<CR>
