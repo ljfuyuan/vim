@@ -24,7 +24,8 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'scrooloose/nerdcommenter'
 Plugin 'luochen1990/rainbow'
 Plugin 'majutsushi/tagbar'
-Plugin 'Valloric/YouCompleteMe'
+"Plugin 'Valloric/YouCompleteMe'
+Plugin 'Shougo/neocomplete.vim'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
 
@@ -284,14 +285,20 @@ let g:go_highlight_function_calls = 1
 let g:go_fmt_command = "goimports"
 let g:go_list_type = "quickfix"
 let g:go_echo_command_info = 1
-let g:go_auto_type_info = 1
+let g:go_auto_type_info = 0
+let g:go_auto_sameids = 0
+let g:go_def_mode='gopls'
+"let g:go_metalinter_command='golangci-lint'
+let g:go_metalinter_autosave = 1
+"let g:go_metalinter_autosave_enabled = ['govet','golint','staticcheck','gosimple','varcheck','deadcode','typecheck']
+let g:go_metalinter_autosave_enabled = ['vet','golint']
 
 let g:syntastic_auto_jump=1
 let g:syntastic_auto_loc_list=1
-" let g:syntastic_go_checkers = ['golint', 'govet', 'errcheck']
-" let g:syntastic_mode_map = { "mode": "passive", "active_filetypes": ["php","go"]}
+"let g:syntastic_mode_map = { "mode": "passive", "active_filetypes": ["go"]}
 let g:syntastic_mode_map = { 'mode': 'active', 'passive_filetypes': ['go','php'] }
-let g:syntastic_go_checkers = ['go']
+let g:syntastic_go_checkers = ['golangci_lint']
+"let g:syntastic_go_golangci_lint_args = "--disable-all=true --no-config --enable=staticcheck --enable=gosimple --enable=varcheck --enable=deadcode"
 let g:syntastic_always_populate_loc_list = 0
 let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 0
@@ -342,32 +349,50 @@ command! -bang Qa qa<bang>
 
 set completeopt=longest,menu	"让Vim的补全菜单行为与一般IDE一致(参考VimTip1228)
 autocmd InsertLeave * if pumvisible() == 0|pclose|endif	"离开插入模式后自动关闭预览窗口
-inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<CR>"	"回车即选中当前项
 
-" 不显示开启vim时检查ycm_extra_conf文件的信息  
-let g:ycm_confirm_extra_conf=0
-" 开启基于tag的补全，可以在这之后添加需要的标签路径  
-let g:ycm_collect_identifiers_from_tags_files=1
-"注释和字符串中的文字也会被收入补全
-let g:ycm_collect_identifiers_from_comments_and_strings = 0
-" 输入第2个字符开始补全
-let g:ycm_min_num_of_chars_for_completion=2
-" 禁止缓存匹配项,每次都重新生成匹配项
-let g:ycm_cache_omnifunc=0
-" 开启语义补全
-let g:ycm_seed_identifiers_with_syntax=1	
-"在注释输入中也能补全
-let g:ycm_complete_in_comments = 1
-"在字符串输入中也能补全
-let g:ycm_complete_in_strings = 1
-" 设置在下面几种格式的文件上屏蔽ycm
-let g:ycm_filetype_blacklist = {
-      \ 'tagbar' : 1,
-      \ 'nerdtree' : 1,
-      \}
-"youcompleteme  默认tab  s-tab 和 ultisnips 冲突
-let g:ycm_key_list_select_completion = ['<Down>']
-let g:ycm_key_list_previous_completion = ['<Up>']
+"Note: This option must be set in .vimrc(_vimrc).  NOT IN .gvimrc(_gvimrc)!
+" Disable AutoComplPop.
+let g:acp_enableAtStartup = 1
+" Use neocomplete.
+let g:neocomplete#enable_at_startup = 1
+" Use smartcase.
+let g:neocomplete#enable_smart_case = 1
+" Set minimum syntax keyword length.
+let g:neocomplete#sources#syntax#min_keyword_length = 3
+
+" Define keyword.
+if !exists('g:neocomplete#keyword_patterns')
+    let g:neocomplete#keyword_patterns = {}
+endif
+let g:neocomplete#keyword_patterns['default'] = '\h\w*'
+
+" Recommended key-mappings.
+" <CR>: close popup and save indent.
+inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+function! s:my_cr_function()
+  return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
+  " For no inserting <CR> key.
+  "return pumvisible() ? "\<C-y>" : "\<CR>"
+endfunction
+" <TAB>: completion.
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+" <C-h>, <BS>: close popup and delete backword char.
+inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
+inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
+
+" Enable omni completion.
+autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+
+" Enable heavy omni completion.
+if !exists('g:neocomplete#sources#omni#input_patterns')
+  let g:neocomplete#sources#omni#input_patterns = {}
+endif
+
+let g:go_gocode_propose_source = 0
 
 " SirVer/ultisnips 代码片断
 " Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
@@ -417,5 +442,7 @@ inoremap <C-k> <C-R>=UltiSnips#ExpandSnippet()<CR>
 
 " Set translate hotkey
 vnoremap <silent> <leader>t :TranslateVisual en:zh-CN<CR>
-nnoremap <silent> <leader>tc :TranslateClear<CR>
+nnoremap <silent> <leader>t <S-v>:TranslateVisual en:zh-CN<CR>
 vnoremap <silent> <leader>tb :TranslateVisual -e bing en:zh-CN<CR>
+nnoremap <silent> <leader>tc :TranslateClear<CR>
+
