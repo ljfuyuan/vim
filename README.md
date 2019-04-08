@@ -9,5 +9,5 @@ setup
 4. brew install ctags
 5. M+ 2m字体下载 https://www.fontke.com/font/17810731/download/
 6. brew install cmake
-7. cd ~/.vim/bundle/YouCompleteMe && ./install.py --gocode-completer
+7. brew install ag
 8. Translate Shell 安装 github.com/soimort/translate-shell
